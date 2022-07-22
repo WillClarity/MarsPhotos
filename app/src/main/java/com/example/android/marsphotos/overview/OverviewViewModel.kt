@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.marsphotos.network.MarsApi
 import com.example.android.marsphotos.network.MarsPhoto
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -13,15 +14,14 @@ import kotlinx.coroutines.launch
  */
 class OverviewViewModel : ViewModel() {
 
-    // The internal MutableLiveData that stores the status of the most recent request
-    private val _name = MutableLiveData<String>()
 
-    // The external immutable LiveData for the request status
+    private val _name = MutableLiveData<String>()
     val name: LiveData<String> = _name
 
-    private val _photos = MutableLiveData<String>()
+    private val _photoUrl = MutableLiveData<String>()
+    val photoUrl: LiveData<String> = _photoUrl
 
-    val photos: LiveData<String> = _photos
+    var increment = 0
 
     /**
      * Call getMarsPhotos() on init so we can display status immediately.
@@ -36,9 +36,23 @@ class OverviewViewModel : ViewModel() {
      */
     private fun getMarsPhotos() {
         viewModelScope.launch {
-            val listResult = MarsApi.retrofitService.getPhotos()
-            _photos.value = listResult[0].imgSrcUrl
-            _name.value = listResult[0].name
+            shuffle()
         }
+    }
+
+    suspend fun shuffle() {
+
+        if (increment == 22)
+            increment = 0
+
+        delay(3000)
+
+        val listResult = MarsApi.retrofitService.getPhotos()
+        _photoUrl.value = listResult[increment].imgSrcUrl
+        _name.value = listResult[increment].name
+
+        increment++
+        shuffle()
+
     }
 }
