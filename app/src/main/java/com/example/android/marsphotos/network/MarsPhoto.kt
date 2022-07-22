@@ -11,4 +11,5 @@ data class MarsPhoto(
     @Json(name = "_id") val id: String,
     val name: String,
     @Json(name = "image") val imgSrcUrl: String
+
 )
